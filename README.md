@@ -10,7 +10,7 @@ Cross-platform Rummy Scorer built with Expo + React Native + TypeScript + Native
 - AsyncStorage for local persistence
 
 ## Features
-- Game setup with dynamic players
+- Game setup with dynamic players.
 - Configurable total score, drop score, middle drop score
 - Round entry with Drop and Middle Drop shortcuts
 - Running totals with knockout logic
