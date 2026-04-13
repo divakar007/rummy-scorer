@@ -6,7 +6,8 @@ export function checkKnockout(totalScore: number, limit: number): boolean {
 
 export function calculateMoneyDistribution(
   players: Player[],
-  moneyPerGame: number
+  moneyPerGame: number,
+  totalScoreLimit: number
 ): Record<string, number> {
   const activePlayers = players.filter((p) => !p.isKnockedOut);
   
@@ -22,14 +23,14 @@ export function calculateMoneyDistribution(
     return distribution;
   }
 
-  // Calculate money based on inverse of scores (lower score = higher reward)
-  const maxScore = Math.max(...activePlayers.map((p) => p.totalScore));
+  // Calculate money based on ratio: (totalScoreLimit - currentScore)
+  // Higher remaining score buffer = higher reward
   const scoreWeights: Record<string, number> = {};
   let totalWeight = 0;
 
   activePlayers.forEach((player) => {
-    // Use inverse weight: higher score = lower weight
-    const weight = maxScore - player.totalScore + 1;
+    // Weight based on how much room they have before knockout
+    const weight = Math.max(0, totalScoreLimit - player.totalScore);
     scoreWeights[player.id] = weight;
     totalWeight += weight;
   });
@@ -42,11 +43,19 @@ export function calculateMoneyDistribution(
     distribution[player.id] = 0;
   });
   
-  // Distribute money only to active players
-  activePlayers.forEach((player) => {
-    const weight = scoreWeights[player.id];
-    distribution[player.id] = (weight / totalWeight) * totalMoney;
-  });
+  // If total weight is 0, distribute equally among active players
+  if (totalWeight === 0) {
+    const equalShare = totalMoney / activePlayers.length;
+    activePlayers.forEach((player) => {
+      distribution[player.id] = equalShare;
+    });
+  } else {
+    // Distribute money based on weights (score buffer ratio)
+    activePlayers.forEach((player) => {
+      const weight = scoreWeights[player.id];
+      distribution[player.id] = (weight / totalWeight) * totalMoney;
+    });
+  }
 
   return distribution;
 }
@@ -70,7 +79,7 @@ export function calculateTotals(
   });
 
   // Calculate money distribution
-  const moneyDistribution = calculateMoneyDistribution(updatedPlayers, moneyPerGame);
+  const moneyDistribution = calculateMoneyDistribution(updatedPlayers, moneyPerGame, totalLimit);
 
   return updatedPlayers.map((player) => ({
     ...player,
