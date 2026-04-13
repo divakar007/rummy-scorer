@@ -10,12 +10,17 @@ export function calculateMoneyDistribution(
 ): Record<string, number> {
   const activePlayers = players.filter((p) => !p.isKnockedOut);
   
-  if (activePlayers.length === 0) {
-    return {};
-  }
-
   // Total money in the pool
   const totalMoney = moneyPerGame * players.length;
+
+  // If no active players or moneyPerGame is 0, return 0 for all
+  if (activePlayers.length === 0 || moneyPerGame === 0) {
+    const distribution: Record<string, number> = {};
+    players.forEach((player) => {
+      distribution[player.id] = 0;
+    });
+    return distribution;
+  }
 
   // Calculate money based on inverse of scores (lower score = higher reward)
   const maxScore = Math.max(...activePlayers.map((p) => p.totalScore));
@@ -31,6 +36,13 @@ export function calculateMoneyDistribution(
 
   // Distribute money based on weights
   const distribution: Record<string, number> = {};
+  
+  // Initialize all players with 0
+  players.forEach((player) => {
+    distribution[player.id] = 0;
+  });
+  
+  // Distribute money only to active players
   activePlayers.forEach((player) => {
     const weight = scoreWeights[player.id];
     distribution[player.id] = (weight / totalWeight) * totalMoney;
