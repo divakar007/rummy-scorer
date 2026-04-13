@@ -7,11 +7,14 @@ export interface Player {
   moneyWon: number;
 }
 
+export type Currency = "INR" | "USD" | "EUR" | "GBP" | "AUD" | "CAD";
+
 export interface GameConfig {
   totalScoreLimit: number;
   dropScore: number;
   middleDropScore: number;
   moneyPerGame: number;
+  currency: Currency;
 }
 
 export interface GameState {

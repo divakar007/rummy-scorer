@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useGame } from "../context/GameContext";
+import { CURRENCIES } from "../utils/currencies";
+import type { Currency } from "../types/game";
 
 const PLAYER_MIN = 2;
 const PLAYER_MAX = 8;
@@ -14,6 +16,7 @@ export function GameSetupScreen() {
   const [dropScore, setDropScore] = useState("25");
   const [middleDropScore, setMiddleDropScore] = useState("40");
   const [moneyPerGame, setMoneyPerGame] = useState("100");
+  const [currency, setCurrency] = useState<Currency>("INR");
 
   const playerCount = useMemo(() => {
     const parsed = Number(playerCountText);
@@ -122,6 +125,30 @@ export function GameSetupScreen() {
                 onChangeText={(text) => setMoneyPerGame(text.replace(/[^0-9]/g, ""))}
               />
             </View>
+            <View>
+              <Text className="mb-2 text-xs text-slate-500">Currency</Text>
+              <View className="flex-row flex-wrap gap-2">
+                {CURRENCIES.map((curr) => (
+                  <TouchableOpacity
+                    key={curr.code}
+                    className={`rounded-xl px-3 py-2 ${
+                      currency === curr.code
+                        ? "bg-brand-500"
+                        : "bg-slate-100 border border-slate-200"
+                    }`}
+                    onPress={() => setCurrency(curr.code)}
+                  >
+                    <Text
+                      className={`text-sm font-semibold ${
+                        currency === curr.code ? "text-white" : "text-slate-900"
+                      }`}
+                    >
+                      {curr.symbol} {curr.code}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
           </View>
         </View>
 
@@ -134,6 +161,7 @@ export function GameSetupScreen() {
               dropScore: Number(dropScore),
               middleDropScore: Number(middleDropScore),
               moneyPerGame: Number(moneyPerGame),
+              currency,
             });
           }}
         >

@@ -14,6 +14,7 @@ const defaultState: GameState = {
     dropScore: 25,
     middleDropScore: 40,
     moneyPerGame: 100,
+    currency: "INR",
   },
   roundHistory: [],
   isStarted: false,

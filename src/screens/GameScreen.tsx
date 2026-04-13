@@ -3,6 +3,7 @@ import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-nativ
 import { PlayerCard } from "../components/PlayerCard";
 import { RoundEntry } from "../components/RoundEntry";
 import { useGame } from "../context/GameContext";
+import { getCurrencySymbol } from "../utils/currencies";
 
 export function GameScreen() {
   const { state, addRound, updateRoundScores, deleteRound, resetGame, newGame, addMidGamePlayer } = useGame();
@@ -68,7 +69,21 @@ export function GameScreen() {
             </View>
             <View className="rounded-xl bg-emerald-100 px-3 py-2">
               <Text className="text-xs text-emerald-600">Money per Game</Text>
-              <Text className="text-sm font-semibold text-emerald-700">₹{state.config.moneyPerGame}</Text>
+              <Text className="text-sm font-semibold text-emerald-700">
+                {getCurrencySymbol(state.config.currency)}{state.config.moneyPerGame}
+              </Text>
+            </View>
+            <View className="rounded-xl bg-blue-100 px-3 py-2">
+              <Text className="text-xs text-blue-600">Bet per Player</Text>
+              <Text className="text-sm font-semibold text-blue-700">
+                {getCurrencySymbol(state.config.currency)}{state.config.moneyPerGame}
+              </Text>
+            </View>
+            <View className="rounded-xl bg-purple-100 px-3 py-2">
+              <Text className="text-xs text-purple-600">Total Pool</Text>
+              <Text className="text-sm font-semibold text-purple-700">
+                {getCurrencySymbol(state.config.currency)}{state.config.moneyPerGame * state.players.length}
+              </Text>
             </View>
             <View className="ml-auto flex-row gap-2">
               <TouchableOpacity className="rounded-xl bg-blue-100 px-3 py-2" onPress={handleAddMidGamePlayer}>
@@ -86,7 +101,12 @@ export function GameScreen() {
 
         <View className="flex-row flex-wrap gap-3">
           {state.players.map((player) => (
-            <PlayerCard key={player.id} player={player} highestScore={highestScore} />
+            <PlayerCard 
+              key={player.id} 
+              player={player} 
+              highestScore={highestScore}
+              currency={state.config.currency}
+            />
           ))}
         </View>
 

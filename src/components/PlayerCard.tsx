@@ -1,14 +1,18 @@
 import React from "react";
 import { Text, View } from "react-native";
 import { Player } from "../types/game";
+import { getCurrencySymbol } from "../utils/currencies";
+import type { Currency } from "../types/game";
 
 interface PlayerCardProps {
   player: Player;
   highestScore: number;
+  currency: Currency;
 }
 
-export function PlayerCard({ player, highestScore }: PlayerCardProps) {
+export function PlayerCard({ player, highestScore, currency }: PlayerCardProps) {
   const isHighest = player.totalScore === highestScore && highestScore > 0;
+  const currencySymbol = getCurrencySymbol(currency);
 
   return (
     <View className="min-w-[160px] flex-1 rounded-2xl bg-white p-4 shadow-card">
@@ -34,7 +38,7 @@ export function PlayerCard({ player, highestScore }: PlayerCardProps) {
       <View className="mt-3 rounded-lg bg-emerald-50 px-2 py-2">
         <Text className="text-xs text-emerald-600">Money Won</Text>
         <Text className="text-2xl font-bold text-emerald-700">
-          ₹{(player.moneyWon ?? 0).toFixed(2)}
+          {currencySymbol}{(player.moneyWon ?? 0).toFixed(2)}
         </Text>
       </View>
     </View>
