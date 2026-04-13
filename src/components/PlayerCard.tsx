@@ -30,6 +30,13 @@ export function PlayerCard({ player, highestScore }: PlayerCardProps) {
         {player.totalScore}
       </Text>
       <Text className="mt-1 text-xs text-slate-500">Total Score</Text>
+
+      <View className="mt-3 rounded-lg bg-emerald-50 px-2 py-2">
+        <Text className="text-xs text-emerald-600">Money Won</Text>
+        <Text className="text-2xl font-bold text-emerald-700">
+          ₹{player.moneyWon.toFixed(2)}
+        </Text>
+      </View>
     </View>
   );
 }

@@ -13,6 +13,7 @@ const defaultState: GameState = {
     totalScoreLimit: 201,
     dropScore: 25,
     middleDropScore: 40,
+    moneyPerGame: 100,
   },
   roundHistory: [],
   isStarted: false,
@@ -26,6 +27,7 @@ interface GameContextValue {
   deleteRound: (roundIndex: number) => void;
   resetGame: () => void;
   newGame: () => void;
+  addMidGamePlayer: (playerName: string) => void;
 }
 
 const GameContext = createContext<GameContextValue | undefined>(undefined);
@@ -61,7 +63,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     basePlayers: Player[],
     history: RoundScores[],
     config: GameConfig
-  ): Player[] => calculateTotals(basePlayers, history, config.totalScoreLimit);
+  ): Player[] => calculateTotals(basePlayers, history, config.totalScoreLimit, config.moneyPerGame);
 
   const startGame = (playerNames: string[], config: GameConfig) => {
     const players: Player[] = playerNames
@@ -73,6 +75,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         scores: [],
         totalScore: 0,
         isKnockedOut: false,
+        moneyWon: 0,
       }));
 
     const nextState: GameState = {
@@ -137,6 +140,8 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+
+
   const resetGame = () => {
     setState((prev) => ({
       ...prev,
@@ -145,6 +150,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         scores: [],
         totalScore: 0,
         isKnockedOut: false,
+        moneyWon: 0,
       })),
       rounds: 0,
       roundHistory: [],
@@ -153,6 +159,59 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
 
   const newGame = () => {
     setState(defaultState);
+  };
+
+  const addMidGamePlayer = (playerName: string) => {
+    setState((prev) => {
+      const trimmedName = playerName.trim();
+      if (!trimmedName) return prev;
+
+      // Calculate the joining score: max(all current players scores) + 1
+      const maxScore = Math.max(0, ...prev.players.map((p) => p.totalScore));
+      const joiningScore = maxScore + 1;
+
+      // Create new player
+      const newPlayer: Player = {
+        id: uuidv4(),
+        name: trimmedName,
+        scores: [joiningScore],
+        totalScore: joiningScore,
+        isKnockedOut: false,
+        moneyWon: 0,
+      };
+
+      // Add new player to the players list
+      const updatedPlayers = [...prev.players, newPlayer];
+
+      // Update round history: add 0 scores for the new player in all existing rounds
+      const updatedHistory = prev.roundHistory.map((round) => ({
+        ...round,
+        [newPlayer.id]: 0,
+      }));
+
+      // Add the joining score to the last round (or create a new round if no rounds exist)
+      let finalHistory = updatedHistory;
+      if (finalHistory.length > 0) {
+        // Add to the last round's entry
+        finalHistory[finalHistory.length - 1] = {
+          ...finalHistory[finalHistory.length - 1],
+          [newPlayer.id]: joiningScore,
+        };
+      } else {
+        // Create first round with joining score
+        finalHistory = [{ [newPlayer.id]: joiningScore }];
+      }
+
+      // Recompute all players with updated money distribution
+      const players = recomputePlayers(updatedPlayers, finalHistory, prev.config);
+
+      return {
+        ...prev,
+        players,
+        roundHistory: finalHistory,
+        rounds: finalHistory.length,
+      };
+    });
   };
 
   const value = useMemo(
@@ -164,6 +223,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       deleteRound,
       resetGame,
       newGame,
+      addMidGamePlayer,
     }),
     [state]
   );

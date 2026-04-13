@@ -4,12 +4,14 @@ export interface Player {
   scores: number[];
   totalScore: number;
   isKnockedOut: boolean;
+  moneyWon: number;
 }
 
 export interface GameConfig {
   totalScoreLimit: number;
   dropScore: number;
   middleDropScore: number;
+  moneyPerGame: number;
 }
 
 export interface GameState {

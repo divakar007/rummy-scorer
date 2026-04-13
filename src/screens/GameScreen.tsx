@@ -5,7 +5,7 @@ import { RoundEntry } from "../components/RoundEntry";
 import { useGame } from "../context/GameContext";
 
 export function GameScreen() {
-  const { state, addRound, updateRoundScores, deleteRound, resetGame, newGame } = useGame();
+  const { state, addRound, updateRoundScores, deleteRound, resetGame, newGame, addMidGamePlayer } = useGame();
 
   const [editingRound, setEditingRound] = useState<number | null>(null);
   const [draftScores, setDraftScores] = useState<Record<string, string>>({});
@@ -41,6 +41,13 @@ export function GameScreen() {
     setDraftScores({});
   };
 
+  const handleAddMidGamePlayer = () => {
+    const playerName = prompt("Enter new player name:");
+    if (playerName && playerName.trim()) {
+      addMidGamePlayer(playerName);
+    }
+  };
+
   return (
     <ScrollView className="flex-1" contentContainerStyle={{ padding: 16 }}>
       <View className="mx-auto w-full max-w-6xl gap-4">
@@ -59,7 +66,14 @@ export function GameScreen() {
               <Text className="text-xs text-slate-500">Middle Drop</Text>
               <Text className="text-sm font-semibold text-slate-900">{state.config.middleDropScore}</Text>
             </View>
+            <View className="rounded-xl bg-emerald-100 px-3 py-2">
+              <Text className="text-xs text-emerald-600">Money per Game</Text>
+              <Text className="text-sm font-semibold text-emerald-700">₹{state.config.moneyPerGame}</Text>
+            </View>
             <View className="ml-auto flex-row gap-2">
+              <TouchableOpacity className="rounded-xl bg-blue-100 px-3 py-2" onPress={handleAddMidGamePlayer}>
+                <Text className="text-sm font-semibold text-blue-700">+ Add Player</Text>
+              </TouchableOpacity>
               <TouchableOpacity className="rounded-xl bg-red-100 px-3 py-2" onPress={resetGame}>
                 <Text className="text-sm font-semibold text-red-700">Reset Game</Text>
               </TouchableOpacity>

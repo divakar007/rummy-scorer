@@ -13,6 +13,7 @@ export function GameSetupScreen() {
   const [totalScoreLimit, setTotalScoreLimit] = useState("201");
   const [dropScore, setDropScore] = useState("25");
   const [middleDropScore, setMiddleDropScore] = useState("40");
+  const [moneyPerGame, setMoneyPerGame] = useState("100");
 
   const playerCount = useMemo(() => {
     const parsed = Number(playerCountText);
@@ -46,7 +47,8 @@ export function GameSetupScreen() {
     playerNames.every((name) => name.trim().length > 0) &&
     Number(totalScoreLimit) > 0 &&
     Number(dropScore) >= 0 &&
-    Number(middleDropScore) >= 0;
+    Number(middleDropScore) >= 0 &&
+    Number(moneyPerGame) > 0;
 
   return (
     <ScrollView className="flex-1" contentContainerStyle={{ padding: 16 }}>
@@ -111,6 +113,15 @@ export function GameSetupScreen() {
                 onChangeText={(text) => setMiddleDropScore(text.replace(/[^0-9]/g, ""))}
               />
             </View>
+            <View>
+              <Text className="mb-1 text-xs text-slate-500">Money per game</Text>
+              <TextInput
+                className="rounded-xl border border-slate-200 px-3 py-2 text-base text-slate-900"
+                keyboardType="number-pad"
+                value={moneyPerGame}
+                onChangeText={(text) => setMoneyPerGame(text.replace(/[^0-9]/g, ""))}
+              />
+            </View>
           </View>
         </View>
 
@@ -122,6 +133,7 @@ export function GameSetupScreen() {
               totalScoreLimit: Number(totalScoreLimit),
               dropScore: Number(dropScore),
               middleDropScore: Number(middleDropScore),
+              moneyPerGame: Number(moneyPerGame),
             });
           }}
         >
